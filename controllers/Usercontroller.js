@@ -1,7 +1,6 @@
 const bcrypt = require("bcryptjs");
 const {validationResult } = require('express-validator');
 const jwt = require("jsonwebtoken");
-const fetchuser = require("../middleware/fetchuser")
 
 const jwtseckey = "createimpact22portal"
 const connectdb = require("../dbconnection")
@@ -90,11 +89,35 @@ const login = async (req, res)=>{
     }
 };
 
-//controller for updating specific user
-const updateuser = async (req, res)=>{
+//controller for fetch all user
+const fetchalluser = async (req, res)=>{
     var success = false
     try {
-        // user.findByIdAndUpdate updates the user data by taking user id in first param and new data in 2nd param
+        // fetch all users 
+        const q = "select *, NULL as password from users"
+        db.query(q,(err,result)=>{
+            if(err) return res.json(err)
+
+            return res.json(result)
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({success:success,msg:"Internal error occurred"})
+    }
+};
+
+//controller for fetch specific user
+const fetchoneuser = async (req, res)=>{
+    var success = false
+    try {
+        // fetch all users 
+        const q = "select *, NULL as password from users where idusers=?"
+        db.query(q,[req.user.id],(err,result)=>{
+            if(err) return res.json(err)
+
+            return res.json(result)
+        })
         
     } catch (error) {
         console.log(error);
@@ -107,6 +130,12 @@ const dltuser = async (req, res)=>{
     var success = false
     try {
         // user.findByIdAndDelete deletes that user whose id is given in the argument of func.
+        const q = "delete from users where idusers=?"
+        db.query(q,[req.user.id],(err,result)=>{
+            if(err) return res.json(err)
+
+            return res.json(result)
+        })
     
     } catch (error) {
         console.log(error);
@@ -115,5 +144,5 @@ const dltuser = async (req, res)=>{
 };
 
 module.exports = {
-    signup,login,updateuser,dltuser
+    signup,login,dltuser,fetchalluser,fetchoneuser
 }
